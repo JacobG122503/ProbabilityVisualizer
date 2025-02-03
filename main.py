@@ -10,13 +10,10 @@ def main():
     attemptsBar = []
     amount = []
     
-    timeMin = float(input("How long would you like the program to run for? (in minutes): "))
-    timeSec = timeMin * 60
-    start_time = time.time()
-    end_time = start_time + timeSec
+    dieInput = int(input("How many times do you want to roll the die?: "))
     
     # Loop start
-    while time.time() < end_time:
+    for i in range(dieInput):
         # Die loop
         attempts = 1
         die = random.randint(1, 6)

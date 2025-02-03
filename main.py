@@ -1,18 +1,48 @@
-import PySimpleGUI as sg
+import matplotlib.pyplot as plt
+import random
+import time
+import os
 
-# All the stuff inside your window.
-layout = [  [sg.Text('Some text on Row 1')],
-            [sg.Text('Enter something on Row 2'), sg.InputText()],
-            [sg.Button('Ok'), sg.Button('Cancel')] ]
+# Run with python3 main.py
 
-# Create the Window
-window = sg.Window('Window Title', layout)
+def main():
+    clear()
+    attemptsBar = []
+    amount = []
+    
+    timeMin = float(input("How long would you like the program to run for? (in minutes): "))
+    timeSec = timeMin * 60
+    start_time = time.time()
+    end_time = start_time + timeSec
+    
+    # Loop start
+    while time.time() < end_time:
+        # Die loop
+        attempts = 1
+        die = random.randint(1, 6)
+        # Rolling until 6
+        while die != 6:
+            die = random.randint(1, 6)
+            attempts += 1
+        
+        # If # of attempts is not already in attemptsBar, add to it.
+        if attempts not in attemptsBar:
+            attemptsBar.append(attempts)
+            amount.append(1)
+        else:
+            # If it is already in attemptsBar, find the position and increment the count
+            idx = attemptsBar.index(attempts)
+            amount[idx] += 1
+    
+    # Set up and display bar graph
+    plt.bar(attemptsBar, amount, color='mediumseagreen')
+    plt.title('Die Rolling')
+    plt.xlabel('Attempt #s')
+    plt.ylabel('Amount')
+    plt.show()
 
-# Event Loop to process "events" and get the "values" of the inputs
-while True:
-    event, values = window.read()
-    if event == sg.WIN_CLOSED or event == 'Cancel': # if user closes window or clicks cancel
-        break
-    print('You entered ', values[0])
+def clear():
+    os.system('cls' if os.name == 'nt' else 'clear')
 
-window.close()
+if __name__ == "__main__":
+    main()

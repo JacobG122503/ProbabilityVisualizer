@@ -25,6 +25,52 @@ def main():
             break
         elif event == 'Die Roll':
             DieRolling()
+        elif event == 'Coin Flip':
+            CoinFlip()
+
+def CoinFlip():
+    side = ["Heads", "Tails"]
+    amount = [0, 0]
+
+    #Input window
+    layout = [
+        [sg.Text('How many times do you want to flip the coin?')],
+        [sg.InputText(key='-INPUT-')],
+        [sg.Button('Run'), sg.Button('Back')],
+        [sg.Canvas(key='-CANVAS-')]
+    ]
+
+    window = sg.Window('Coin Flip Simulator', layout, finalize=True, location=(sg.Window.get_screen_size()[0] // 2 - 200, sg.Window.get_screen_size()[1] // 2 - 150))
+
+    while True:
+        event, values = window.read()
+        if event == sg.WINDOW_CLOSED or event == 'Back':
+            break
+        if event == 'Run':
+            try:
+                coinFlips = int(values['-INPUT-'])
+
+                for _ in range(coinFlips):
+                    coin = random.randint(0, 1)
+                    amount[coin] += 1
+
+                #Set up and display bar graph
+                fig, ax = plt.subplots()
+                ax.bar(side, amount, color='mediumseagreen')
+                ax.set_title('Coin Flipping')
+                ax.set_xlabel('Side')
+                ax.set_ylabel('Amount')
+
+                #Clear previous plot if exists
+                for child in window['-CANVAS-'].TKCanvas.winfo_children():
+                    child.destroy()
+
+                draw_figure(window['-CANVAS-'].TKCanvas, fig)
+
+            except ValueError:
+                sg.popup_error("Please enter a valid number!")
+
+    window.close()
 
 def draw_figure(canvas, figure):
     figure_canvas_agg = FigureCanvasTkAgg(figure, canvas)

@@ -1,6 +1,7 @@
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.animation import FuncAnimation
 import random
 import PySimpleGUI as sg
 
@@ -102,37 +103,47 @@ def DieRolling():
                 attemptsBar.clear()
                 amount.clear()
 
-                #Loop start
-                for _ in range(dieInput):
-                    #Die loop
-                    attempts = 1
-                    die = random.randint(1, 6)
-                    #Rolling until 6
-                    while die != 6:
-                        die = random.randint(1, 6)
-                        attempts += 1
-
-                    #If # of attempts is not already in attemptsBar, add to it.
-                    if attempts not in attemptsBar:
-                        attemptsBar.append(attempts)
-                        amount.append(1)
-                    else:
-                        #If it is already in attemptsBar, find the position and increment the count
-                        idx = attemptsBar.index(attempts)
-                        amount[idx] += 1
-
-                #Set up and display bar graph
-                fig, ax = plt.subplots()
-                ax.bar(attemptsBar, amount, color='mediumseagreen')
-                ax.set_title('Die Rolling')
-                ax.set_xlabel('Attempt #s')
-                ax.set_ylabel('Amount')
-
                 #Clear previous plot if exists
                 for child in window['-CANVAS-'].TKCanvas.winfo_children():
                     child.destroy()
 
-                draw_figure(window['-CANVAS-'].TKCanvas, fig)
+                #Set up and display bar graph
+                fig, ax = plt.subplots()
+                bars = ax.bar([], [], color='mediumseagreen')
+                ax.set_title('Die Rolling')
+                ax.set_xlabel('Attempt #s')
+                ax.set_ylabel('Amount')
+
+                canvas = FigureCanvasTkAgg(fig, window['-CANVAS-'].TKCanvas)
+                canvas.draw()
+                canvas.get_tk_widget().pack(side='top', fill='both', expand=1)
+
+                data = []
+
+                # Animation update function
+                def update(frame):
+                    attempts = 1
+                    die = random.randint(1, 6)
+                    while die != 6:
+                        die = random.randint(1, 6)
+                        attempts += 1
+
+                    if attempts not in attemptsBar:
+                        attemptsBar.append(attempts)
+                        amount.append(1)
+                    else:
+                        idx = attemptsBar.index(attempts)
+                        amount[idx] += 1
+
+                    ax.clear()
+                    ax.bar(attemptsBar, amount, color='mediumseagreen')
+                    ax.set_title('Die Rolling')
+                    ax.set_xlabel('Attempt #s')
+                    ax.set_ylabel('Amount')
+
+                    canvas.draw()
+
+                ani = FuncAnimation(fig, update, frames=dieInput, interval=0, repeat=False)
 
             except ValueError:
                 sg.popup_error("Please enter a valid number!")
